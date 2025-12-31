@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Daisy",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/libs/libDaisy/src",
+                "${workspaceFolder}/libs/DaisySP/Source",
+                "${workspaceFolder}/libs/libDaisy/Drivers/CMSIS/Include",
+                "${workspaceFolder}/libs/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "${workspaceFolder}/libs/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32H750xx",
+                "USE_HAL_DRIVER"
+            ],
+            "compilerPath": "C:/Program Files/DaisyToolchain/bin/arm-none-eabi-g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}

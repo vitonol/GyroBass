@@ -3,7 +3,7 @@ TARGET = OverdriveUnit
 
 #Sources
 CPP_SOURCES = src/main.cpp \
-              src/drivers/CustomGyro.cpp \
+              src/sensors/CustomGyro.cpp \
               src/dsp/DynamicStateVariableFilter.cpp
 
 # Library Location - Poining to gitsubmodules

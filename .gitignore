@@ -1,6 +1,14 @@
+# Ignore Eclipse / CubeIDE files
+.cproject
+.project
+.settings/
+.mxproject
 
+# Ignore VS Code files
+.vscode/*
+
+# Ignore Build Artifacts
 build/
-
 *.o
 *.d
 *.su
@@ -10,11 +18,9 @@ build/
 *.map
 *.lst
 
-
 libs/libDaisy/build/
 libs/DaisySP/build/
 
-.vscode/*
 !.vscode/tasks.json
 !.vscode/c_cpp_properties.json
 !.vscode/launch.json

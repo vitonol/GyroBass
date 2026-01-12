@@ -29,6 +29,16 @@
             "command": "make clean",
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "build_and_program_stlink",
+            "type": "shell",
+            "command": "make program",
+            "dependsOn": "build_all",
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }

@@ -1,5 +1,7 @@
 #include <sys/stat.h>
 
+// Newlib syscall stubs for bare metal ARM
+
 int _close(int file) { return -1; }
 int _fstat(int file, struct stat *st) { return -1; }
 int _isatty(int file) { return 0; }

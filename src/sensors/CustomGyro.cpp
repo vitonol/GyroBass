@@ -46,7 +46,9 @@ void CustomGyro::Process()
         float acc_x = raw_x / 16384.0f;
 
         // Map to 0.0 - 1.0 range
-        float target = (acc_x + 1.0f) * 0.5f;
+        const float min_acc = -0.966f; // 8.5 o'clock
+        const float max_acc = -0.5f;   // 11 o'clock
+        float target = (acc_x - min_acc) / (max_acc - min_acc);
 
         // Clamp 
         if(target > 1.0f) target = 1.0f;

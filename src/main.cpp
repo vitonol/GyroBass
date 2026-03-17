@@ -5,6 +5,7 @@
 ___________________________________________________________________________________
 */
 
+#include <atomic>
 #include "daisy_seed.h"
 #include "daisysp.h"
 #include "FreeRTOS.h"
@@ -22,8 +23,12 @@ DcBlock     dc;
 Switch      button1;
 
 // Global Variables
-volatile float g_tilt = 0.5f;
+// volatile float g_tilt = 0.5f;
 volatile static int fxIncrement = 0;
+
+/* - SPSC - */ 
+
+std::atomic<float> g_tilt;
 
 extern "C" {
     // Get the FreeRTOS tick function prototype
@@ -53,30 +58,36 @@ void AudioCallback(AudioHandle::InputBuffer  in,
 
     // Maping Filter Frequency cutoff sensor's rotation
     float tilt_hz = 160.0f + (g_tilt * g_tilt * 3350.0f);
-    
-    filter.SetFreq(tilt_hz); 
-    filter.SetRes(0.15f); 
+
+    filter.SetFreq(tilt_hz);
+    filter.SetRes(0.15f);
     filter.SetDrive(0.0f); // Clean filter resonance
 
     for(size_t i = 0; i < size; i++)
     {
         float raw_input = dc.Process(in[0][i]);
-        // Tame the input volume before distortion by allowing some headroom to prevent quick compression buildup
-        float signal_to_distort = raw_input * 0.6f;
-        float wet_signal = drive.Process(signal_to_distort);
-        // Only filter the wet signal - allowing clean low end to pass through
-        filter.Process(wet_signal);
-        float filtered_wet = 0;
 
-        switch (fxIncrement) {
-            case 0: filtered_wet = filter.Low(); break;
-            case 1: filtered_wet = filter.Notch(); break;
-            case 2: filtered_wet = filter.Band(); break;
+        if (fxIncrement == 3) {
+            // Bypass mode: clean bass only (no overdrive, no filtering)
+            out[0][i] = out[1][i] = raw_input;
+        } else {
+            // Tame the input volume before distortion by allowing some headroom to prevent quick compression buildup
+            float signal_to_distort = raw_input * 0.75f;
+            float wet_signal = drive.Process(signal_to_distort);
+            // Only filter the wet signal - allowing clean low end to pass through
+            filter.Process(wet_signal);
+            float filtered_wet = 0;
+
+            switch (fxIncrement) {
+                case 0: filtered_wet = filter.Low(); break;
+                case 1: filtered_wet = filter.Notch(); break;
+                case 2: filtered_wet = filter.Band(); break;
+            }
+
+            // Blend clean signal with distorted - favor overdrive for aggressive tone
+            float master_mix = (raw_input * 0.35f) + (filtered_wet * 0.70f);
+            out[0][i] = out[1][i] = master_mix;
         }
-
-        // Blend clean signal with distorted
-        float master_mix = (raw_input * 0.6f) + (filtered_wet * 0.5f);
-        out[0][i] = out[1][i] = master_mix;
     }
 }
 
@@ -102,7 +113,7 @@ void Task_UI(void *param)
         if(button1.RisingEdge())
         {
             led_state = !led_state; // blinks led briefly on or off depending on the current tilt value
-            fxIncrement = (fxIncrement + 1) % 3;
+            fxIncrement = (fxIncrement + 1) % 4;
         }
         vTaskDelay(pdMS_TO_TICKS(50));
         hw.SetLed(led_state);
